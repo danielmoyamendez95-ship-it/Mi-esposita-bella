@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Pixel Art Animado</title>
+  <title>Pixel Art 8-Bit</title>
 
   <style>
     body {
@@ -12,10 +12,6 @@
       font-family: Arial;
     }
 
-    h1 {
-      margin-top: 20px;
-    }
-
     canvas {
       margin-top: 20px;
       border: 2px solid white;
@@ -23,9 +19,9 @@
     }
 
     button {
-      margin-top: 15px;
-      padding: 12px 25px;
-      font-size: 16px;
+      margin: 5px;
+      padding: 12px 20px;
+      font-size: 14px;
       background: #6366f1;
       color: white;
       border: none;
@@ -33,18 +29,42 @@
       border-radius: 8px;
     }
 
-    button:hover {
-      background: #4f46e5;
+    .progress-container {
+      width: 300px;
+      height: 20px;
+      background: #1e293b;
+      border-radius: 10px;
+      margin: 15px auto;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #6366f1;
+      transition: width 0.1s;
+    }
+
+    #textoProgreso {
+      margin-top: 5px;
+      font-size: 14px;
+      color: #cbd5f5;
     }
   </style>
 </head>
 <body>
 
-<h1>Pixel Art Retro (Animado)</h1>
+<h1>Pixel Art Retro 8-Bit 🎮</h1>
 
 <button id="btn">Generar Imagen</button>
+<button id="muteBtn">🔊 Sonido ON</button>
 
-<br>
+<div class="progress-container">
+  <div class="progress-bar" id="barra"></div>
+</div>
+
+<div id="textoProgreso">Esperando...</div>
+
 <canvas id="canvas"></canvas>
 
 <script src="script.js"></script>
