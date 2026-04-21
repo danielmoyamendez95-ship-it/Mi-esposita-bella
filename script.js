@@ -1,18 +1,18 @@
 // BOTONES
 const btn = document.getElementById("btn");
 const muteBtn = document.getElementById("muteBtn");
+const downloadBtn = document.getElementById("downloadBtn");
 
 btn.addEventListener("click", () => {
   iniciarSonido();
   generar();
 });
 
-// 🔊 AUDIO
+// 🔊 AUDIO SPIDERMAN VIBE
 let audioCtx = null;
 let isMuted = false;
 let intervalMelodia = null;
 
-// 🎵 notas
 const notas = {
   C4: 261,
   D4: 293,
@@ -25,16 +25,15 @@ const notas = {
   D5: 587
 };
 
-// 🕷️ melodía más estilo Spiderman
 const melodia = [
-  "E4","G4","A4","C5",
-  "B4","A4","G4","E4",
+  "E4","E4","G4","A4",
+  "G4","E4","D4","E4",
+
+  "E4","E4","G4","A4",
+  "C5","B4","A4","G4",
 
   "G4","A4","C5","D5",
-  "C5","A4","G4","E4",
-
-  "E4","G4","A4","C5",
-  "B4","A4","G4","E4"
+  "C5","A4","G4","E4"
 ];
 
 // 🔘 MUTE
@@ -45,6 +44,7 @@ muteBtn.addEventListener("click", () => {
   if (isMuted) detenerSonido();
 });
 
+// 🔊 SONIDO
 function iniciarSonido() {
   if (isMuted) return;
 
@@ -61,23 +61,38 @@ function iniciarSonido() {
   intervalMelodia = setInterval(() => {
     if (isMuted) return;
 
+    const nota = melodia[i];
+
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
 
     osc.type = "square";
-    osc.frequency.value = notas[melodia[i]];
-
+    osc.frequency.value = notas[nota];
     gain.gain.value = 0.12;
 
+    // bajo
+    const bass = audioCtx.createOscillator();
+    const bassGain = audioCtx.createGain();
+
+    bass.type = "triangle";
+    bass.frequency.value = notas[nota] / 2;
+    bassGain.gain.value = 0.06;
+
     osc.connect(gain);
+    bass.connect(bassGain);
+
     gain.connect(audioCtx.destination);
+    bassGain.connect(audioCtx.destination);
 
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.15);
+    bass.start();
+
+    osc.stop(audioCtx.currentTime + 0.16);
+    bass.stop(audioCtx.currentTime + 0.16);
 
     i = (i + 1) % melodia.length;
 
-  }, 110);
+  }, 125);
 }
 
 function detenerSonido() {
@@ -87,9 +102,24 @@ function detenerSonido() {
   }
 }
 
-// 🎮 FUNCIÓN MEJORADA (NO MATA COLOR)
+// 💾 DESCARGA
+downloadBtn.addEventListener("click", () => {
+  const canvas = document.getElementById("canvas");
+
+  if (!canvas || canvas.width === 0) {
+    alert("Primero genera la imagen 😉");
+    return;
+  }
+
+  const link = document.createElement("a");
+  link.download = "Lys_pixel_art.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+});
+
+// 🎮 COLOR (SIN PERDER TONOS)
 function quantizeColor(r, g, b) {
-  const levels = 6; // 🔥 más niveles = más color
+  const levels = 6;
   const step = 255 / (levels - 1);
 
   r = Math.round(r / step) * step;
@@ -114,7 +144,7 @@ function generar() {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
-    const scale = 0.15; // 🔥 MÁS DETALLE
+    const scale = 0.15;
 
     const w = Math.floor(img.width * scale);
     const h = Math.floor(img.height * scale);
@@ -165,12 +195,11 @@ function generar() {
       let b = data[index + 2];
       const a = data[index + 3] / 255;
 
-      // 🔥 BOOST COLOR (clave)
+      // 🔥 boost color
       r = Math.min(255, r * 1.2);
       g = Math.min(255, g * 1.2);
       b = Math.min(255, b * 1.2);
 
-      // 🎮 cuantización sin perder color
       [r, g, b] = quantizeColor(r, g, b);
 
       ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
