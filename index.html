@@ -1,64 +1,53 @@
-document.getElementById("btn")?.addEventListener("click", generar);
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pixel Art Animado</title>
 
-function generar() {
-  const img = new Image();
-  img.src = "imagen.jpg";
-
-  img.onload = function () {
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-
-    const scale = 0.08;
-
-    const w = Math.floor(img.width * scale);
-    const h = Math.floor(img.height * scale);
-
-    // canvas pequeño (base)
-    const tempCanvas = document.createElement("canvas");
-    const tctx = tempCanvas.getContext("2d");
-
-    tempCanvas.width = w;
-    tempCanvas.height = h;
-
-    tctx.drawImage(img, 0, 0, w, h);
-
-    const data = tctx.getImageData(0, 0, w, h).data;
-
-    // canvas final grande
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    ctx.imageSmoothingEnabled = false;
-
-    const pixelSize = Math.floor(img.width / w);
-
-    let x = 0;
-    let y = 0;
-
-    function dibujarPixel() {
-      if (y >= h) return;
-
-      const index = (y * w + x) * 4;
-
-      const r = data[index];
-      const g = data[index + 1];
-      const b = data[index + 2];
-      const a = data[index + 3] / 255;
-
-      ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
-      ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-
-      x++;
-
-      if (x >= w) {
-        x = 0;
-        y++;
-      }
-
-      // 🔥 velocidad de dibujo (ajusta esto)
-      setTimeout(dibujarPixel, 1);
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      font-family: Arial;
     }
 
-    dibujarPixel();
-  };
-}
+    h1 {
+      margin-top: 20px;
+    }
+
+    canvas {
+      margin-top: 20px;
+      border: 2px solid white;
+      image-rendering: pixelated;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 25px;
+      font-size: 16px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    button:hover {
+      background: #4f46e5;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Pixel Art Retro (Animado)</h1>
+
+<button id="btn">Generar Imagen</button>
+
+<br>
+<canvas id="canvas"></canvas>
+
+<script src="script.js"></script>
+
+</body>
+</html>
