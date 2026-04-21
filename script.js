@@ -1,13 +1,13 @@
-// BOTÓN
+// BOTONES
 const btn = document.getElementById("btn");
 const muteBtn = document.getElementById("muteBtn");
 
 btn.addEventListener("click", () => {
-  iniciarSonido(); // 🔥 sonido desde click (clave)
+  iniciarSonido();
   generar();
 });
 
-// 🔊 AUDIO 8-BIT MELODÍA
+// 🔊 AUDIO
 let audioCtx = null;
 let isMuted = false;
 let intervalMelodia = null;
@@ -24,10 +24,14 @@ const notas = {
   C5: 523
 };
 
-// 🎮 melodía estilo héroe
+// 🕷️ melodía estilo Spiderman
 const melodia = [
-  "E4","G4","A4","G4",
-  "E4","D4","C4","D4",
+  "E4","E4","G4","A4",
+  "G4","E4","D4","E4",
+
+  "G4","A4","C5","A4",
+  "G4","E4","D4","C4",
+
   "E4","G4","A4","C5",
   "B4","A4","G4","E4"
 ];
@@ -40,7 +44,6 @@ muteBtn.addEventListener("click", () => {
   if (isMuted) detenerSonido();
 });
 
-// 🔊 iniciar melodía
 function iniciarSonido() {
   if (isMuted) return;
 
@@ -63,7 +66,7 @@ function iniciarSonido() {
     osc.type = "square";
     osc.frequency.value = notas[melodia[i]];
 
-    gain.gain.value = 0.05;
+    gain.gain.value = 0.08;
 
     osc.connect(gain);
     gain.connect(audioCtx.destination);
@@ -73,10 +76,9 @@ function iniciarSonido() {
 
     i = (i + 1) % melodia.length;
 
-  }, 180);
+  }, 140);
 }
 
-// 🔇 detener
 function detenerSonido() {
   if (intervalMelodia) {
     clearInterval(intervalMelodia);
@@ -84,24 +86,27 @@ function detenerSonido() {
   }
 }
 
-// 🎮 PALETA 8-BIT
+// 🎮 PALETA COLOR (ARREGLADA)
 const palette = [
-  [0, 0, 0],
-  [255, 255, 255],
-  [136, 0, 0],
-  [170, 255, 238],
-  [204, 68, 204],
-  [0, 204, 85],
-  [0, 0, 170],
-  [238, 238, 119],
-  [221, 136, 85],
-  [102, 68, 0],
-  [255, 119, 119],
-  [51, 51, 51],
-  [119, 119, 119],
-  [170, 255, 102],
-  [0, 136, 255],
-  [187, 187, 187]
+  [0,0,0],
+  [255,255,255],
+
+  [228,0,88],
+  [255,77,109],
+
+  [0,48,135],
+  [0,102,204],
+
+  [255,204,0],
+  [0,200,83],
+  [0,255,255],
+
+  [255,140,0],
+  [160,32,240],
+
+  [60,60,60],
+  [120,120,120],
+  [200,200,200]
 ];
 
 function getClosestColor(r, g, b) {
@@ -168,7 +173,6 @@ function generar() {
       }
     }
 
-    // 🎨 efecto dibujado a mano
     pixels.sort(() => Math.random() - 0.5);
 
     let i = 0;
@@ -178,7 +182,6 @@ function generar() {
       if (i >= total) {
         texto.innerText = "✅ Completado";
         barra.style.width = "100%";
-
         detenerSonido();
         return;
       }
