@@ -1,10 +1,88 @@
-document.getElementById("btn").addEventListener("click", generar);
-
+// BOTÓN
+const btn = document.getElementById("btn");
 const muteBtn = document.getElementById("muteBtn");
 
-let audioCtx;
-let oscillator;
+btn.addEventListener("click", () => {
+  iniciarSonido(); // 🔥 sonido desde click (clave)
+  generar();
+});
+
+// 🔊 AUDIO 8-BIT MELODÍA
+let audioCtx = null;
 let isMuted = false;
+let intervalMelodia = null;
+
+// 🎵 notas
+const notas = {
+  C4: 261,
+  D4: 293,
+  E4: 329,
+  F4: 349,
+  G4: 392,
+  A4: 440,
+  B4: 493,
+  C5: 523
+};
+
+// 🎮 melodía estilo héroe
+const melodia = [
+  "E4","G4","A4","G4",
+  "E4","D4","C4","D4",
+  "E4","G4","A4","C5",
+  "B4","A4","G4","E4"
+];
+
+// 🔘 MUTE
+muteBtn.addEventListener("click", () => {
+  isMuted = !isMuted;
+  muteBtn.innerText = isMuted ? "🔇 Sonido OFF" : "🔊 Sonido ON";
+
+  if (isMuted) detenerSonido();
+});
+
+// 🔊 iniciar melodía
+function iniciarSonido() {
+  if (isMuted) return;
+
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+
+  let i = 0;
+
+  intervalMelodia = setInterval(() => {
+    if (isMuted) return;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "square";
+    osc.frequency.value = notas[melodia[i]];
+
+    gain.gain.value = 0.05;
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.15);
+
+    i = (i + 1) % melodia.length;
+
+  }, 180);
+}
+
+// 🔇 detener
+function detenerSonido() {
+  if (intervalMelodia) {
+    clearInterval(intervalMelodia);
+    intervalMelodia = null;
+  }
+}
 
 // 🎮 PALETA 8-BIT
 const palette = [
@@ -45,42 +123,6 @@ function getClosestColor(r, g, b) {
   return closest;
 }
 
-// 🔘 MUTE
-muteBtn.addEventListener("click", () => {
-  isMuted = !isMuted;
-  muteBtn.innerText = isMuted ? "🔇 Sonido OFF" : "🔊 Sonido ON";
-
-  if (isMuted) detenerSonido();
-});
-
-// 🔊 SONIDO
-function iniciarSonido() {
-  if (isMuted) return;
-
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-  oscillator = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
-
-  oscillator.type = "square";
-  oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
-
-  gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-
-  oscillator.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-
-  oscillator.start();
-}
-
-function detenerSonido() {
-  if (oscillator) {
-    oscillator.stop();
-    oscillator.disconnect();
-    oscillator = null;
-  }
-}
-
 // 🎨 GENERAR
 function generar() {
   const img = new Image();
@@ -92,8 +134,6 @@ function generar() {
   img.onerror = () => alert("❌ No se encontró la imagen");
 
   img.onload = function () {
-
-    iniciarSonido();
 
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
@@ -128,7 +168,7 @@ function generar() {
       }
     }
 
-    // 🎨 orden aleatorio (efecto mano)
+    // 🎨 efecto dibujado a mano
     pixels.sort(() => Math.random() - 0.5);
 
     let i = 0;
@@ -138,6 +178,7 @@ function generar() {
       if (i >= total) {
         texto.innerText = "✅ Completado";
         barra.style.width = "100%";
+
         detenerSonido();
         return;
       }
@@ -150,7 +191,6 @@ function generar() {
       let b = data[index + 2];
       const a = data[index + 3] / 255;
 
-      // 🎮 aplicar 8-bit
       [r, g, b] = getClosestColor(r, g, b);
 
       ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
