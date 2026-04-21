@@ -216,7 +216,7 @@ function generar() {
       barra.style.width = porcentaje + "%";
       texto.innerText = "Generando... " + porcentaje + "%";
 
-      setTimeout(dibujarPixel, 1);
+      setTimeout(dibujarPixel, 4);
     }
 
     dibujarPixel();
