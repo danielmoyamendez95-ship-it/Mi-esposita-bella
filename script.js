@@ -21,16 +21,17 @@ const notas = {
   G4: 392,
   A4: 440,
   B4: 493,
-  C5: 523
+  C5: 523,
+  D5: 587
 };
 
-// 🕷️ melodía estilo Spiderman
+// 🕷️ melodía más estilo Spiderman
 const melodia = [
-  "E4","E4","G4","A4",
-  "G4","E4","D4","E4",
+  "E4","G4","A4","C5",
+  "B4","A4","G4","E4",
 
-  "G4","A4","C5","A4",
-  "G4","E4","D4","C4",
+  "G4","A4","C5","D5",
+  "C5","A4","G4","E4",
 
   "E4","G4","A4","C5",
   "B4","A4","G4","E4"
@@ -66,7 +67,7 @@ function iniciarSonido() {
     osc.type = "square";
     osc.frequency.value = notas[melodia[i]];
 
-    gain.gain.value = 0.08;
+    gain.gain.value = 0.12;
 
     osc.connect(gain);
     gain.connect(audioCtx.destination);
@@ -76,7 +77,7 @@ function iniciarSonido() {
 
     i = (i + 1) % melodia.length;
 
-  }, 140);
+  }, 110);
 }
 
 function detenerSonido() {
@@ -86,46 +87,16 @@ function detenerSonido() {
   }
 }
 
-// 🎮 PALETA COLOR (ARREGLADA)
-const palette = [
-  [0,0,0],
-  [255,255,255],
+// 🎮 FUNCIÓN MEJORADA (NO MATA COLOR)
+function quantizeColor(r, g, b) {
+  const levels = 6; // 🔥 más niveles = más color
+  const step = 255 / (levels - 1);
 
-  [228,0,88],
-  [255,77,109],
+  r = Math.round(r / step) * step;
+  g = Math.round(g / step) * step;
+  b = Math.round(b / step) * step;
 
-  [0,48,135],
-  [0,102,204],
-
-  [255,204,0],
-  [0,200,83],
-  [0,255,255],
-
-  [255,140,0],
-  [160,32,240],
-
-  [60,60,60],
-  [120,120,120],
-  [200,200,200]
-];
-
-function getClosestColor(r, g, b) {
-  let minDist = Infinity;
-  let closest = palette[0];
-
-  for (let p of palette) {
-    const dr = r - p[0];
-    const dg = g - p[1];
-    const db = b - p[2];
-    const dist = dr * dr + dg * dg + db * db;
-
-    if (dist < minDist) {
-      minDist = dist;
-      closest = p;
-    }
-  }
-
-  return closest;
+  return [r, g, b];
 }
 
 // 🎨 GENERAR
@@ -143,7 +114,7 @@ function generar() {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
-    const scale = 0.08;
+    const scale = 0.15; // 🔥 MÁS DETALLE
 
     const w = Math.floor(img.width * scale);
     const h = Math.floor(img.height * scale);
@@ -194,7 +165,13 @@ function generar() {
       let b = data[index + 2];
       const a = data[index + 3] / 255;
 
-      [r, g, b] = getClosestColor(r, g, b);
+      // 🔥 BOOST COLOR (clave)
+      r = Math.min(255, r * 1.2);
+      g = Math.min(255, g * 1.2);
+      b = Math.min(255, b * 1.2);
+
+      // 🎮 cuantización sin perder color
+      [r, g, b] = quantizeColor(r, g, b);
 
       ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
       ctx.fillRect(
